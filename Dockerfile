@@ -13,6 +13,7 @@ COPY requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 RUN apt-get -y update
 RUN apt -y install nano
+RUN export MISTRAL_API_KEY="TVgCvsfUiqr5m8F1JSleadiEpHF5UdhL"
 
 COPY . ./
 
