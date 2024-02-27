@@ -10,6 +10,7 @@ import os  # Import the os module for interacting with the operating system
 from dotenv import load_dotenv
 from streamlit_option_menu import option_menu
 import time
+import csv
 
 UPLOAD_DIRECTORY = os.path.abspath("Data")
 load_dotenv()
@@ -23,7 +24,7 @@ CSV_FILE = "Data/chat_history.csv"
 try:
     chat_history_df = pd.read_csv(CSV_FILE)
 except FileNotFoundError:
-    chat_history_df = pd.DataFrame(columns=["ChatID", "Role", "Content", 'User'])
+    chat_history_df = pd.DataFrame(columns=["Role", "Content", "ChatID", 'User'])
 
 authenticator = stauth.Authenticate(
     config['credentials'],
@@ -43,20 +44,27 @@ models = {"Mistral-tiny":"open-mistral-7b", "Mistral-small":"open-mixtral-8x7b",
 client = MistralClient(api_key=mistral_api_key)
 
 def reset_conv():
-    st.session_state["ChatID"] = hash(time.time())
+    st.session_state["ChatID"] = time.time()
     st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
     st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant préparé pour aider l'utilisateur")]
     st.session_state["history"].append(ChatMessage(role= "assistant", content= f"Bonjour {name}, comment puis-je vous aider?"))
 
 def save_history():
-    chat_history_df.to_csv(CSV_FILE, index=False)
+    
+    df = pd.read_csv(CSV_FILE)
+    df =  df[df.ChatID != st.session_state.ChatID] 
+    df.to_csv(CSV_FILE, index=False)
+    df = pd.DataFrame(st.session_state.messages)
+    df['ChatID'] = st.session_state.ChatID
+    df['User'] = username
+    df.to_csv('Data/chat_history.csv', mode='a', header=False, index=False)
 
 def disconnect():
     authenticator.logout('logout', 'unrendered')
 
 def get_button_label(chat_df, chat_id):
-    first_message = chat_df[(chat_df["ChatID"] == chat_id) & (chat_df["Role"] == "User")].iloc[0]["Content"]
-    return f"Chat {chat_id[0:7]}: {' '.join(first_message.split()[:5])}..."
+    first_message = chat_df[(chat_df["ChatID"] == chat_id) & (chat_df["Role"] == "user")].iloc[0]["Content"]
+    return f"Chat {str(chat_id)[5:10]}: {' '.join(first_message.split()[:5])}..."
 
 name, authentication_status, username = authenticator.login('main', fields = {'Form name':'Chatbot ASTRUZ', 'Username':'Nom d\'utilisateur', 'Password':'Mot de passe', 'Login':'Connexion'})
 
@@ -76,19 +84,20 @@ if authentication_status:
             st.button("Sauvegarder la conversation", on_click=save_history)
         st.header("Historique de conversation:")
 
-    for chat_id in chat_history_df["ChatID"].unique():
-        button_label = get_button_label(chat_history_df, chat_id)
-        if st.sidebar.button(button_label, key=chat_id, use_container_width=True):
-            current_chat_id = chat_id
-            loaded_chat = chat_history_df[chat_history_df["ChatID"] == chat_id]
-            loaded_chat_string = "\n".join(f"{row['Role']}: {row['Content']}" for _, row in loaded_chat.iterrows())
-            st.text_area("Chat History", value=loaded_chat_string, height=300)
-
     if "messages" not in st.session_state:
-        st.session_state["ChatID"] = hash(time.time())
+        st.session_state["ChatID"] = time.time()
         st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
         st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant compétent qui avait proposé votre aide à l'utilisateur")]
         st.session_state["history"].append(ChatMessage(role= "assistant", content= f"Bonjour {name}, comment puis-je vous aider?"))
+
+    for chat_id in chat_history_df[chat_history_df["User"] == username]["ChatID"].unique():
+        button_label = get_button_label(chat_history_df, chat_id)
+        if st.sidebar.button(button_label, key=chat_id, use_container_width=True):
+            st.session_state["ChatID"] = chat_id
+            loaded_chat = chat_history_df[chat_history_df["ChatID"] == chat_id]
+            st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant compétent qui avait proposé votre aide à l'utilisateur")]
+            st.session_state["history"].extend(ChatMessage(role= row["Role"], content= row["Content"]) for _, row in loaded_chat.iterrows())
+            st.session_state["messages"] = [{"role": row["Role"], "content": row["Content"]} for _, row in loaded_chat.iterrows()]
 
     for msg in st.session_state.messages:
         st.chat_message(msg["role"]).write(msg["content"])
@@ -96,7 +105,7 @@ if authentication_status:
     if prompt := st.chat_input():
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.session_state.history.append(ChatMessage(role= "user", content= prompt))
-
+        print(st.session_state.messages)
         st.chat_message("user").write(prompt)
 
         with st.chat_message("assistant"):
