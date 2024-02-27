@@ -1,0 +1,18 @@
+cookie:
+  expiry_days: 30
+  key: my_secret_key
+  name: my_cookie_name
+credentials:
+  usernames:
+    jbastruz:
+      email: none
+      logged_in: false
+      name: Jean-Baptiste
+      password: Jbastruz74940
+    jmastruz:
+      email: none
+      logged_in: false
+      name: Jean-Marc
+      password: JMA260364
+preauthorized:
+  emails: []
