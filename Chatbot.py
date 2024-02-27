@@ -100,7 +100,6 @@ if authentication_status:
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = ""
-            print(st.session_state.history)
             for response in client.chat_stream(
                 model=models[selector],
                 messages=st.session_state.history
