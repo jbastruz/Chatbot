@@ -43,6 +43,7 @@ models = {"Mistral-tiny":"open-mistral-7b", "Mistral-small":"open-mixtral-8x7b",
 client = MistralClient(api_key=mistral_api_key)
 
 def reset_conv():
+    st.session_state["ChatID"] = hash(time.time())
     st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
     st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant préparé pour aider l'utilisateur")]
     st.session_state["history"].append(ChatMessage(role= "assistant", content= f"Bonjour {name}, comment puis-je vous aider?"))
