@@ -1,31 +1,36 @@
-import pandas as pd  # Import the pandas library for data manipulation
-import streamlit_authenticator as stauth  # Import the streamlit_authenticator library for user authentication
-from yaml.loader import SafeLoader  # Import the SafeLoader from the yaml.loader module for loading YAML data safely
-from mistralai.client import MistralClient
-from mistralai.models.chat_completion import ChatMessage  # Import the datetime module for working with dates and times
-import pytz as tz  # Import the pytz module for working with time zones
-import streamlit as st  # Import the streamlit library for creating web apps
-import yaml  # Import the yaml library for working with YAML files
-import os  # Import the os module for interacting with the operating system
-from dotenv import load_dotenv
-from streamlit_option_menu import option_menu
-import time
+import pandas as pd # Import the pandas library for data manipulation
+import streamlit_authenticator as stauth # Import the streamlit_authenticator library for user authentication
+from yaml.loader import SafeLoader # Import the SafeLoader from the yaml.loader module for loading YAML data safely
+from mistralai.client import MistralClient # Import the MistralClient from the mistralai.client module
+from mistralai.models.chat_completion import ChatMessage # Import the ChatMessage from the mistralai.models.chat_completion module
+import pytz as tz # Import the pytz module for working with time zones
+import streamlit as st # Import the streamlit library for creating web apps
+import yaml # Import the yaml library for working with YAML files
+import os # Import the os module for interacting with the operating system
+from dotenv import load_dotenv # Import the load_dotenv function from the dotenv module
+from streamlit_option_menu import option_menu # Import the option_menu function from the streamlit_option_menu module
+import time # Import the time module for working with time
 
 UPLOAD_DIRECTORY = os.path.abspath("Data")
 load_dotenv()
 
+# Open the 'config.yaml' file and load its content safely
 with open('config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
+# If the upload directory does not exist, create it
 if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
 
 CSV_FILE = "Data/chat_history.csv"
+
+# Try to read the CSV file, if it doesn't exist, create an empty DataFrame
 try:
     chat_history_df = pd.read_csv(CSV_FILE)
 except FileNotFoundError:
     chat_history_df = pd.DataFrame(columns=["Role", "Content", "ChatID", 'User'])
 
+# Authenticate the user
 authenticator = stauth.Authenticate(
     config['credentials'],
     config['cookie']['name'],
@@ -34,22 +39,32 @@ authenticator = stauth.Authenticate(
     config['preauthorized']
 )
 
+# Check if the Mistral API key is set, if not, show an info message and stop
 if not os.getenv("MISTRAL_API_KEY"):
     st.info("Please add your Mistral API key in your environment variables to continue.")
     st.stop()
-else :
+else:
     mistral_api_key = os.getenv("MISTRAL_API_KEY")
 
-models = {"Mistral-tiny":"open-mistral-7b", "Mistral-small":"open-mixtral-8x7b", "Mistral-medium":"mistral-medium-2312", "Mistral-large":"mistral-large-latest"}
+# Define models dictionary
+models = {
+    "Mistral-tiny": "open-mistral-7b", 
+    "Mistral-small": "open-mixtral-8x7b", 
+    "Mistral-medium": "mistral-medium-2312", 
+    "Mistral-large": "mistral-large-latest"
+}
+
+# Create Mistral client with API key
 client = MistralClient(api_key=mistral_api_key)
 
+# Reset conversation state
 def reset_conv():
     st.session_state["ChatID"] = time.time()
     st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
     st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant préparé pour aider l'utilisateur")]
 
+# Save chat history
 def save_history():
-    
     df = pd.read_csv(CSV_FILE)
     df =  df[df.ChatID != st.session_state.ChatID] 
     df.to_csv(CSV_FILE, index=False)
@@ -58,9 +73,11 @@ def save_history():
     df['User'] = username
     df.to_csv('Data/chat_history.csv', mode='a', header=False, index=False)
 
+# Disconnect the user
 def disconnect():
     authenticator.logout('logout', 'unrendered')
 
+# Get the button label based on chat history
 def get_button_label(chat_df, chat_id):
     first_message = chat_df[(chat_df["ChatID"] == chat_id) & (chat_df["Role"] == "user")].iloc[0]["Content"]
     return f"Chat {str(chat_id)[5:10]}: {' '.join(first_message.split()[:5])}..."
