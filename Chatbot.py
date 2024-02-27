@@ -105,7 +105,7 @@ if authentication_status:
     if prompt := st.chat_input():
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.session_state.history.append(ChatMessage(role= "user", content= prompt))
-        print(st.session_state.messages)
+
         st.chat_message("user").write(prompt)
 
         with st.chat_message("assistant"):
