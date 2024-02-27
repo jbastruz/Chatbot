@@ -18,7 +18,7 @@ credentials:
       email: none
       logged_in: false
       name: Mimoune
-      password: 260496
+      password: '260496'
     iastruz:
       email: none
       logged_in: false
