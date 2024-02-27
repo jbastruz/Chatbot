@@ -40,14 +40,13 @@ if not os.getenv("MISTRAL_API_KEY"):
 else :
     mistral_api_key = os.getenv("MISTRAL_API_KEY")
 
-models = {"Mistral-tiny":"open-mistral-7b", "Mistral-small":"open-mixtral-8x7b", "Mistral-medium":"mistral-medium-2312", "Mistral-large (WIP)":"mistral-large-latest"}
+models = {"Mistral-tiny":"open-mistral-7b", "Mistral-small":"open-mixtral-8x7b", "Mistral-medium":"mistral-medium-2312", "Mistral-large":"mistral-large-latest"}
 client = MistralClient(api_key=mistral_api_key)
 
 def reset_conv():
     st.session_state["ChatID"] = time.time()
     st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
     st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant préparé pour aider l'utilisateur")]
-    st.session_state["history"].append(ChatMessage(role= "assistant", content= f"Bonjour {name}, comment puis-je vous aider?"))
 
 def save_history():
     
@@ -73,22 +72,21 @@ if authentication_status:
         st.title("🤖💬 Chatruz 🤖💬")
         st.caption("By Jean-Baptiste ASTRUZ")
         st.header("Modèles:")
-        selector = option_menu(None ,["Mistral-tiny", 'Mistral-small', 'Mistral-medium', 'Mistral-large (WIP)'], 
+        selector = option_menu(None ,["Mistral-tiny", 'Mistral-small', 'Mistral-medium', "Mistral-large"], 
             icons=['star', 'star-half', 'star-fill', 'stars'], menu_icon="chat-dots", default_index=1)
         st.divider()
         st.button("Se deconnecter", on_click=disconnect, use_container_width=True)
         col1, col2 = st.columns([4, 4])
         with col1:
-            st.button("Recommencer la conversation", on_click=reset_conv)
+            st.button("Recommencer la conversation", on_click=reset_conv, use_container_width=True)
         with col2:
-            st.button("Sauvegarder la conversation", on_click=save_history)
+            st.button("Sauvegarder la conversation", on_click=save_history, use_container_width=True)
         st.header("Historique de conversation:")
 
     if "messages" not in st.session_state:
         st.session_state["ChatID"] = time.time()
         st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
         st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant compétent qui avait proposé votre aide à l'utilisateur")]
-        st.session_state["history"].append(ChatMessage(role= "assistant", content= f"Bonjour {name}, comment puis-je vous aider?"))
 
     for chat_id in chat_history_df[chat_history_df["User"] == username]["ChatID"].unique():
         button_label = get_button_label(chat_history_df, chat_id)
@@ -105,17 +103,17 @@ if authentication_status:
     if prompt := st.chat_input():
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.session_state.history.append(ChatMessage(role= "user", content= prompt))
-
+        print(st.session_state.history)
         st.chat_message("user").write(prompt)
 
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = ""
-            for response in client.chat_stream(
-                model=models[selector],
-                messages=st.session_state.history
-            ):
-                full_response += (response.choices[0].delta.content or "")
+            for reponse in client.chat_stream(
+                            model=models[selector],
+                            messages=st.session_state.history
+                        ) :
+                full_response += (reponse.choices[0].delta.content or "")
                 message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
             st.session_state.history.append(ChatMessage(role="assistant", content=full_response))
