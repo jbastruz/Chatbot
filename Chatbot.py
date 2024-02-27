@@ -18,6 +18,12 @@ with open('config.yaml') as file:
 if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
 
+CSV_FILE = "Data/chat_history.csv"
+try:
+    chat_history_df = pd.read_csv(CSV_FILE)
+except FileNotFoundError:
+    chat_history_df = pd.DataFrame(columns=["ChatID", "Role", "Content", 'User'])
+
 authenticator = stauth.Authenticate(
     config['credentials'],
     config['cookie']['name'],
@@ -33,20 +39,49 @@ else :
     mistral_api_key = os.getenv("MISTRAL_API_KEY")
 
 models = {"Mistral-tiny":"open-mistral-7b", "Mistral-small":"open-mixtral-8x7b", "Mistral-medium":"mistral-medium-2312", "Mistral-large (WIP)":"mistral-large-latest"}
-model = "open-mixtral-8x7b"
 client = MistralClient(api_key=mistral_api_key)
+
+def reset_conv():
+    st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
+    st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant préparé pour aider l'utilisateur")]
+    st.session_state["history"].append(ChatMessage(role= "assistant", content= f"Bonjour {name}, comment puis-je vous aider?"))
+
+def save_history():
+
+    chat_history_df.to_csv(CSV_FILE, index=False)
+
+def disconnect():
+    authenticator.logout('logout', 'unrendered')
+
+def get_button_label(chat_df, chat_id):
+    first_message = chat_df[(chat_df["ChatID"] == chat_id) & (chat_df["Role"] == "User")].iloc[0]["Content"]
+    return f"Chat {chat_id[0:7]}: {' '.join(first_message.split()[:5])}..."
 
 name, authentication_status, username = authenticator.login('main', fields = {'Form name':'Chatbot ASTRUZ', 'Username':'Nom d\'utilisateur', 'Password':'Mot de passe', 'Login':'Connexion'})
 
 if authentication_status:
     with st.sidebar:
-        st.title("💬 Chatbot ASTRUZ")
+        st.title("🤖💬 Chatruz 🤖💬")
         st.caption("By Jean-Baptiste ASTRUZ")
         st.header("Modèles:")
         selector = option_menu(None ,["Mistral-tiny", 'Mistral-small', 'Mistral-medium', 'Mistral-large (WIP)'], 
             icons=['star', 'star-half', 'star-fill', 'stars'], menu_icon="chat-dots", default_index=1)
         st.divider()
+        st.button("Se deconnecter", on_click=disconnect, use_container_width=True)
+        col1, col2 = st.columns([4, 4])
+        with col1:
+            st.button("Recommencer la conversation", on_click=reset_conv)
+        with col2:
+            st.button("Sauvegarder la conversation", on_click=save_history)
         st.header("Historique de conversation:")
+
+    for chat_id in chat_history_df["ChatID"].unique():
+        button_label = get_button_label(chat_history_df, chat_id)
+        if st.sidebar.button(button_label, key=chat_id, use_container_width=True):
+            current_chat_id = chat_id
+            loaded_chat = chat_history_df[chat_history_df["ChatID"] == chat_id]
+            loaded_chat_string = "\n".join(f"{row['Role']}: {row['Content']}" for _, row in loaded_chat.iterrows())
+            st.text_area("Chat History", value=loaded_chat_string, height=300)
 
     if "messages" not in st.session_state:
         st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
