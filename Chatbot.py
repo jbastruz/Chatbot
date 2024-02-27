@@ -9,6 +9,7 @@ import yaml  # Import the yaml library for working with YAML files
 import os  # Import the os module for interacting with the operating system
 from dotenv import load_dotenv
 from streamlit_option_menu import option_menu
+import time
 
 UPLOAD_DIRECTORY = os.path.abspath("Data")
 load_dotenv()
@@ -47,7 +48,6 @@ def reset_conv():
     st.session_state["history"].append(ChatMessage(role= "assistant", content= f"Bonjour {name}, comment puis-je vous aider?"))
 
 def save_history():
-
     chat_history_df.to_csv(CSV_FILE, index=False)
 
 def disconnect():
@@ -84,6 +84,7 @@ if authentication_status:
             st.text_area("Chat History", value=loaded_chat_string, height=300)
 
     if "messages" not in st.session_state:
+        st.session_state["ChatID"] = hash(time.time())
         st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
         st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant compétent qui avait proposé votre aide à l'utilisateur")]
         st.session_state["history"].append(ChatMessage(role= "assistant", content= f"Bonjour {name}, comment puis-je vous aider?"))
