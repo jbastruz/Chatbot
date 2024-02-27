@@ -7,11 +7,12 @@ import pytz as tz  # Import the pytz module for working with time zones
 import streamlit as st  # Import the streamlit library for creating web apps
 import yaml  # Import the yaml library for working with YAML files
 import os  # Import the os module for interacting with the operating system
+from dotenv import load_dotenv
 from streamlit_option_menu import option_menu
 import time
-import csv
 
 UPLOAD_DIRECTORY = os.path.abspath("Data")
+load_dotenv()
 
 with open('config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
