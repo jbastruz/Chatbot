@@ -7,9 +7,10 @@ import pytz as tz  # Import the pytz module for working with time zones
 import streamlit as st  # Import the streamlit library for creating web apps
 import yaml  # Import the yaml library for working with YAML files
 import os  # Import the os module for interacting with the operating system
+from dotenv import load_dotenv
 
 UPLOAD_DIRECTORY = os.path.abspath("Data")
-
+load_dotenv()
 with open('config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
@@ -30,7 +31,7 @@ if not os.getenv("MISTRAL_API_KEY"):
 else :
     mistral_api_key = os.getenv("MISTRAL_API_KEY")
 
-model = "mistral-medium"
+model = "open-mixtral-8x7b"
 
 client = MistralClient(api_key=mistral_api_key)
 
@@ -43,7 +44,8 @@ if authentication_status:
 
     if "messages" not in st.session_state:
         st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
-        st.session_state["history"] = [ChatMessage(role= "assistant", content= f"Bonjour {name}, comment puis-je vous aider?")]
+        st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant compétent qui avait proposé votre aide à l'utilisateur")]
+        st.session_state["history"].append(ChatMessage(role= "assistant", content= f"Bonjour {name}, comment puis-je vous aider?"))
 
     for msg in st.session_state.messages:
         st.chat_message(msg["role"]).write(msg["content"])
@@ -53,8 +55,17 @@ if authentication_status:
         st.session_state.history.append(ChatMessage(role= "user", content= prompt))
 
         st.chat_message("user").write(prompt)
-        response = client.chat(model=model, messages=st.session_state.history)
-        print(response.choices[0].message.content)
-#        msg = response.choices[0].delta.content
-#        st.session_state.messages.append({"role": "assistant", "content": msg})
-#        st.chat_message("assistant").write(msg)
+        
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            print(st.session_state.history)
+            for response in client.chat_stream(
+                model=model,
+                messages=st.session_state.history
+            ):
+                full_response += (response.choices[0].delta.content or "")
+                message_placeholder.markdown(full_response + "▌")
+            message_placeholder.markdown(full_response)
+            st.session_state.history.append(ChatMessage(role="assistant", content=full_response))
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
