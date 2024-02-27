@@ -14,5 +14,20 @@ credentials:
       logged_in: false
       name: Jean-Marc
       password: JMA260364
+    mimoune:
+      email: none
+      logged_in: false
+      name: Mimoune
+      password: 260496
+    iastruz:
+      email: none
+      logged_in: false
+      name: Isabelle
+      password: ISA020564
+    tokiwooki:
+      email: none
+      logged_in: false
+      name: Caroline
+      password: schwabl
 preauthorized:
   emails: []
