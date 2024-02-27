@@ -24,30 +24,37 @@ authenticator = stauth.Authenticate(
     config['preauthorized']
 )
 
+if not os.getenv("MISTRAL_API_KEY"):
+    st.info("Please add your Mistral API key in your environment variables to continue.")
+    st.stop()
+else :
+    mistral_api_key = os.getenv("MISTRAL_API_KEY")
+
+model = "mistral-medium"
+
+client = MistralClient(api_key=mistral_api_key)
+
 name, authentication_status, username = authenticator.login('main', fields = {'Form name':'Chatbot ASTRUZ', 'Username':'Nom d\'utilisateur', 'Password':'Mot de passe', 'Login':'Connexion'})
 
 if authentication_status:
-    st.markdown("<h1 style='text-align: center;'>Suivi d'Intervention</h1>", unsafe_allow_html=True)
-
-    with st.container(border=True) :
-        st.session_state.Miss = st.selectbox(
-        " ".join(('Missions de ', name,':')),
-        st.session_state.df[st.session_state.df["Inter"] == username]['KEY'].unique(),
-        index=0)
-
-    col1, col2 = st.columns([4, 1])
-    with col1:
-        st.session_state.Notes = st.text_input('Notes de l\'intervenant :', placeholder = "Notez vos observations...")
-    with col2:
-        container = st.container(border=True)
-        with container:
-            st.markdown(f"""Montant à payer: \n :red[***{st.session_state.df[st.session_state.df['KEY']==st.session_state.Miss]["total_ttc"].values[0]}€***]""")
-            print(st.session_state.df[st.session_state.df['KEY']==st.session_state.Miss]["total_ttc"])
-        #st.session_state.time = st.number_input("Prix :", min_value = 0.0, max_value = 24.0, value = "min", step = 0.5, help = "Prix à faire payer", disabled = True)
-    uploaded_file = st.file_uploader("Ajoute des photos :", accept_multiple_files=True, help="Ajoutez des photos de l'intervention")
-
-    st.button('Mettre à jour', on_click = MaJ, use_container_width = True)
-
     with st.sidebar:
-        st.title("Réglages :")
-        st.button('déconnexion', on_click=deco, key = 'unrendered', use_container_width = True)
+        st.title("💬 Chatbot ASTRUZ")
+        st.caption("By Jean-Baptiste ASTRUZ")
+
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
+        st.session_state["history"] = [ChatMessage(role= "assistant", content= f"Bonjour {name}, comment puis-je vous aider?")]
+
+    for msg in st.session_state.messages:
+        st.chat_message(msg["role"]).write(msg["content"])
+
+    if prompt := st.chat_input():
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        st.session_state.history.append(ChatMessage(role= "user", content= prompt))
+
+        st.chat_message("user").write(prompt)
+        response = client.chat(model=model, messages=st.session_state.history)
+        print(response.choices[0].message.content)
+#        msg = response.choices[0].delta.content
+#        st.session_state.messages.append({"role": "assistant", "content": msg})
+#        st.chat_message("assistant").write(msg)

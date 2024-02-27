@@ -18,8 +18,8 @@ COPY . ./
 
 RUN pip install -r requirements.txt
 #Copy files to your container
-COPY Intervention.py ./Intervention.py
+COPY Chatbot.py ./Chatbot.py
 EXPOSE 8501
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
-ENTRYPOINT ["streamlit", "run", "Intervention.py", "--server.enableCORS=false"]
+ENTRYPOINT ["streamlit", "run", "Chatbot.py"]
