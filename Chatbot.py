@@ -131,7 +131,7 @@ if authentication_status:
             message_placeholder = st.empty()
             full_response = ""
             for reponse in client.chat_stream(
-                            model=models[my_selection],
+                            model=models[selector],
                             messages=st.session_state.history
                         ) :
                 full_response += (reponse.choices[0].delta.content or "")
