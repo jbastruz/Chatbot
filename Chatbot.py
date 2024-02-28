@@ -116,7 +116,7 @@ if authentication_status:
             loaded_chat = chat_history_df[chat_history_df["ChatID"] == chat_id]
             st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant compétent qui avait proposé votre aide à l'utilisateur")]
             st.session_state["history"].extend(ChatMessage(role= row["Role"], content= row["Content"]) for _, row in loaded_chat.iterrows())
-            st.session_state["history"].pop(0)
+            st.session_state["history"].pop(1)
             st.session_state["messages"] = [{"role": row["Role"], "content": row["Content"]} for _, row in loaded_chat.iterrows()]
 
     for msg in st.session_state.messages:
