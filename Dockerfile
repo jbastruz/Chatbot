@@ -24,3 +24,5 @@ EXPOSE 8501
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
 ENTRYPOINT ["streamlit", "run", "Chatbot.py"]
+
+#nativefier --name Audiofy https://share.streamlit.io/sree369nidhi/audiobook/main/pdf_to_audiobook.py --platform windows
