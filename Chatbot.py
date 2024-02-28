@@ -11,6 +11,10 @@ from dotenv import load_dotenv # Import the load_dotenv function from the dotenv
 from streamlit_option_menu import option_menu # Import the option_menu function from the streamlit_option_menu module
 import time # Import the time module for working with time
 
+st.set_page_config(
+    page_title="Chatruz",
+    page_icon= 'Data/electron.png'
+)
 UPLOAD_DIRECTORY = os.path.abspath("Data")
 load_dotenv()
 
@@ -85,13 +89,13 @@ def get_button_label(chat_df, chat_id):
 name, authentication_status, username = authenticator.login('main', fields = {'Form name':'Chatbot ASTRUZ', 'Username':'Nom d\'utilisateur', 'Password':'Mot de passe', 'Login':'Connexion'})
 
 if authentication_status:
+
     with st.sidebar:
         st.title("🤖💬 Chatruz 🤖💬")
         st.caption("By Jean-Baptiste ASTRUZ")
-        st.header("Modèles:")
-        selector = option_menu(None ,["Mistral-tiny", 'Mistral-small', 'Mistral-medium', "Mistral-large"], 
-            icons=['star', 'star-half', 'star-fill', 'stars'], menu_icon="chat-dots", default_index=1)
-        st.divider()
+        with st.expander("Modèles"):
+            selector = option_menu(None ,["Mistral-tiny", 'Mistral-small', 'Mistral-medium', "Mistral-large"], 
+                icons=['star', 'star-half', 'star-fill', 'stars'], menu_icon="chat-dots", default_index=1)
         st.button("Se deconnecter", on_click=disconnect, use_container_width=True)
         col1, col2 = st.columns([4, 4])
         with col1:
@@ -127,7 +131,7 @@ if authentication_status:
             message_placeholder = st.empty()
             full_response = ""
             for reponse in client.chat_stream(
-                            model=models[selector],
+                            model=models[my_selection],
                             messages=st.session_state.history
                         ) :
                 full_response += (reponse.choices[0].delta.content or "")
