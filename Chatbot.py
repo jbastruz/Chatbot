@@ -12,7 +12,7 @@ from streamlit_option_menu import option_menu # Import the option_menu function 
 import time # Import the time module for working with time
 
 st.set_page_config(
-    page_title="Chatruz",
+    page_title="Chastruz",
     page_icon= 'https://mistral.ai/images/news/announcing-mistral.png'
 )
 UPLOAD_DIRECTORY = os.path.abspath("Data")
