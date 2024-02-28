@@ -91,11 +91,7 @@ name, authentication_status, username = authenticator.login('main', fields = {'F
 if authentication_status:
 
     with st.sidebar:
-        col1, col2 = st.columns(2)
-        with col1:
-            st.image("https://mistral.ai/images/news/announcing-mistral.png")
-        with col2:
-            st.title("🤖💬 Chastruz 🤖💬")
+        st.title("Chastruz 🤖💬")
         st.caption("By Jean-Baptiste ASTRUZ")
         with st.expander("Modèles"):
             selector = option_menu(None ,["Mistral-tiny", 'Mistral-small', 'Mistral-medium', "Mistral-large"], 
