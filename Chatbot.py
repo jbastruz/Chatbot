@@ -13,7 +13,7 @@ import time # Import the time module for working with time
 
 st.set_page_config(
     page_title="Chatruz",
-    page_icon= 'Data/electron.png'
+    page_icon= 'https://mistral.ai/images/news/announcing-mistral.png'
 )
 UPLOAD_DIRECTORY = os.path.abspath("Data")
 load_dotenv()
@@ -91,7 +91,11 @@ name, authentication_status, username = authenticator.login('main', fields = {'F
 if authentication_status:
 
     with st.sidebar:
-        st.title("🤖💬 Chatruz 🤖💬")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.image("https://mistral.ai/images/news/announcing-mistral.png")
+        with col2:
+            st.title("🤖💬 Chastruz 🤖💬")
         st.caption("By Jean-Baptiste ASTRUZ")
         with st.expander("Modèles"):
             selector = option_menu(None ,["Mistral-tiny", 'Mistral-small', 'Mistral-medium', "Mistral-large"], 
