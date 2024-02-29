@@ -109,7 +109,7 @@ if authentication_status:
         st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
         st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant compétent qui avait proposé votre aide à l'utilisateur")]
 
-    for chat_id in chat_history_df[chat_history_df["User"] == username]["ChatID"].unique():
+    for chat_id in chat_history_df[chat_history_df["User"] == username]["ChatID"].unique()[::-1]
         button_label = get_button_label(chat_history_df, chat_id)
         if st.sidebar.button(button_label, key=chat_id, use_container_width=True):
             st.session_state["ChatID"] = chat_id
