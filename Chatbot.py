@@ -142,7 +142,7 @@ if authentication_status:
         st.session_state.mark = st.markdown(f"""
             <style>
             .big-font {{
-                font-size:60px;
+                font-size:50px;
                 background: linear-gradient(to right, red, orange);
                 font-weight: 500;
                 font-family: sans-serif;
@@ -152,6 +152,7 @@ if authentication_status:
                 -moz-text-fill-color: transparent;
                 background-clip: text;
                 color: transparent;
+                line-height: 4rem;
             }}
             </style>
             <div class="big-font">Bonjour {name},</div>
@@ -169,7 +170,8 @@ if authentication_status:
                 -moz-text-fill-color: transparent;
                 background-clip: text;
                 color: transparent;
+                line-height: 4rem;
             }}
             </style>
-            <div class="small-font">De quoi avez-vous besoin aujourd'hui ?</div>
+            <div class="small-font">De quoi as-tu besoin aujourd'hui ?</div>
             """, unsafe_allow_html=True)

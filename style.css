@@ -1,0 +1,26 @@
+.big-font {
+    font-size:60px;
+    background: linear-gradient(to right, red, orange);
+    font-weight: 500;
+    font-family: sans-serif;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    line-height: 4rem;
+}
+.small-font {
+    font-size:60px;
+    background: lightgrey;
+    font-weight: 500;
+    font-family: sans-serif;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    line-height: 4rem;
+}
