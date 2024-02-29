@@ -155,7 +155,7 @@ if authentication_status:
                 -moz-text-fill-color: transparent;
                 background-clip: text;
                 color: transparent;
-                line-height: 1;
+                line-height: 1.1;
             }}
             </style>
             <div class="big-font">Bonjour {name},</div>
@@ -173,7 +173,7 @@ if authentication_status:
                 -moz-text-fill-color: transparent;
                 background-clip: text;
                 color: transparent;
-                line-height: 1;
+                line-height: 1.1;
             }}
             </style>
             <div class="small-font">De quoi as-tu besoin aujourd'hui ?</div>
