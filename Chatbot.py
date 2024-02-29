@@ -119,6 +119,9 @@ if authentication_status:
             st.session_state["history"].pop(1)
             st.session_state["messages"] = [{"role": row["Role"], "content": row["Content"]} for _, row in loaded_chat.iterrows()]
 
+    for msg in st.session_state.messages:
+        st.chat_message(msg["role"]).write(msg["content"])
+
     if prompt := st.chat_input():
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.session_state.history.append(ChatMessage(role= "user", content= prompt))
@@ -152,7 +155,7 @@ if authentication_status:
                 -moz-text-fill-color: transparent;
                 background-clip: text;
                 color: transparent;
-                line-height: 4rem;
+                line-height: 1;
             }}
             </style>
             <div class="big-font">Bonjour {name},</div>
@@ -170,7 +173,7 @@ if authentication_status:
                 -moz-text-fill-color: transparent;
                 background-clip: text;
                 color: transparent;
-                line-height: 4rem;
+                line-height: 1;
             }}
             </style>
             <div class="small-font">De quoi as-tu besoin aujourd'hui ?</div>
