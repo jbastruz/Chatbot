@@ -64,7 +64,7 @@ client = MistralClient(api_key=mistral_api_key)
 # Reset conversation state
 def reset_conv():
     st.session_state["ChatID"] = time.time()
-    st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
+    st.session_state["messages"] = []
     st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant préparé pour aider l'utilisateur")]
 
 # Save chat history
@@ -106,10 +106,10 @@ if authentication_status:
 
     if "messages" not in st.session_state:
         st.session_state["ChatID"] = time.time()
-        st.session_state["messages"] = [{"role": "assistant", "content": f"Bonjour {name}, comment puis-je vous aider?"}]
+        st.session_state["messages"] = []
         st.session_state["history"] = [ChatMessage(role= "system", content= "Vous êtes un assistant compétent qui avait proposé votre aide à l'utilisateur")]
 
-    for chat_id in chat_history_df[chat_history_df["User"] == username]["ChatID"].unique()[::-1]
+    for chat_id in chat_history_df[chat_history_df["User"] == username]["ChatID"].unique()[::-1]:
         button_label = get_button_label(chat_history_df, chat_id)
         if st.sidebar.button(button_label, key=chat_id, use_container_width=True):
             st.session_state["ChatID"] = chat_id
@@ -118,9 +118,6 @@ if authentication_status:
             st.session_state["history"].extend(ChatMessage(role= row["Role"], content= row["Content"]) for _, row in loaded_chat.iterrows())
             st.session_state["history"].pop(1)
             st.session_state["messages"] = [{"role": row["Role"], "content": row["Content"]} for _, row in loaded_chat.iterrows()]
-
-    for msg in st.session_state.messages:
-        st.chat_message(msg["role"]).write(msg["content"])
 
     if prompt := st.chat_input():
         st.session_state.messages.append({"role": "user", "content": prompt})
@@ -140,3 +137,39 @@ if authentication_status:
             message_placeholder.markdown(full_response)
             st.session_state.history.append(ChatMessage(role="assistant", content=full_response))
             st.session_state.messages.append({"role": "assistant", "content": full_response})
+    
+    if st.session_state["messages"] == []:
+        st.session_state.mark = st.markdown(f"""
+            <style>
+            .big-font {{
+                font-size:60px;
+                background: linear-gradient(to right, red, orange);
+                font-weight: 500;
+                font-family: sans-serif;
+                -webkit-background-clip: text;
+                -moz-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                -moz-text-fill-color: transparent;
+                background-clip: text;
+                color: transparent;
+            }}
+            </style>
+            <div class="big-font">Bonjour {name},</div>
+            """, unsafe_allow_html=True)
+        st.markdown(f"""
+            <style>
+            .small-font {{
+                font-size:50px;
+                background: lightgrey;
+                font-weight: 500;
+                font-family: sans-serif;
+                -webkit-background-clip: text;
+                -moz-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                -moz-text-fill-color: transparent;
+                background-clip: text;
+                color: transparent;
+            }}
+            </style>
+            <div class="small-font">De quoi avez-vous besoin aujourd'hui ?</div>
+            """, unsafe_allow_html=True)
