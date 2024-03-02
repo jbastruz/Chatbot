@@ -23,7 +23,7 @@ COPY Chatbot.py ./Chatbot.py
 EXPOSE 8501
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
-ENTRYPOINT ["streamlit", "run", "Chatbot.py", "--enableCORS = true", "--enableXsrfProtection = true"]
+ENTRYPOINT ["streamlit", "run", "Chatbot.py", "--enableCORS = false", "--enableXsrfProtection = false"]
 
 #nativefier --name Audiofy https://share.streamlit.io/sree369nidhi/audiobook/main/pdf_to_audiobook.py --platform windows
 #nativefier --name '<you .exe name>' '<your streamlit sharing website url>' --platform <'windows' or 'mac' or 'linux'>
