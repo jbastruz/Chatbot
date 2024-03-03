@@ -8,26 +8,26 @@ credentials:
       email: none
       logged_in: false
       name: Jean-Baptiste
-      password: Jbastruz74940
+      password: *********
     jmastruz:
       email: none
       logged_in: false
       name: Jean-Marc
-      password: JMA260364
+      password: *********
     mimoune:
       email: none
       logged_in: false
       name: Mimoune
-      password: '260496'
+      password: *********
     iastruz:
       email: none
       logged_in: false
       name: Isabelle
-      password: ISA020564
+      password: *********
     tokiwooki:
       email: none
       logged_in: false
       name: Caroline
-      password: schwabl
+      password: *********
 preauthorized:
   emails: []
