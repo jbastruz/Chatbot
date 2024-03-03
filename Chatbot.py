@@ -18,7 +18,7 @@ st.set_page_config(
 UPLOAD_DIRECTORY = os.path.abspath("Data")
 load_dotenv()
 
-# Open the 'config.yaml' file and load its content safely
+# Open the 'config.ya<ml' file and load its content safely<<<<
 with open('config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
