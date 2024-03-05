@@ -13,7 +13,7 @@ COPY requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 RUN apt-get -y update
 RUN apt -y install nano
-RUN export MISTRAL_API_KEY="TVgCvsfUiqr5m8F1JSleadiEpHF5UdhL"
+RUN export MISTRAL_API_KEY="***"
 
 COPY . ./
 
@@ -23,7 +23,7 @@ COPY Chatbot.py ./Chatbot.py
 EXPOSE 8501
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
-ENTRYPOINT ["streamlit", "run", "Chatbot.py", "--enableCORS = false", "--enableXsrfProtection = false"]
+ENTRYPOINT ["streamlit", "run", "Chatbot.py", "--server.enableCORS", "false", "--server.enableXsrfProtection", "false"]
 
 #nativefier --name Audiofy https://share.streamlit.io/sree369nidhi/audiobook/main/pdf_to_audiobook.py --platform windows
 #nativefier --name '<you .exe name>' '<your streamlit sharing website url>' --platform <'windows' or 'mac' or 'linux'>

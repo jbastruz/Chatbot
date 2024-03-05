@@ -1,3 +1,5 @@
 .env
 test.ipynb
 Chatbot-darwin-x64/
+.gitingnore
+Config*

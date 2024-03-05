@@ -81,6 +81,16 @@ def save_history():
 def disconnect():
     authenticator.logout('logout', 'unrendered')
 
+def remove_top():
+    st.markdown("""
+        <style>
+            .st-emotion-cache-16txtl3 {
+                padding-top: 0rem;
+                padding-bottom: 0rem;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+    
 # Get the button label based on chat history
 def get_button_label(chat_df, chat_id):
     first_message = chat_df[(chat_df["ChatID"] == chat_id) & (chat_df["Role"] == "user")].iloc[0]["Content"]
@@ -91,6 +101,7 @@ name, authentication_status, username = authenticator.login('main', fields = {'F
 if authentication_status:
 
     with st.sidebar:
+        remove_top()
         st.title("Chastruz 🤖💬")
         st.caption("By Jean-Baptiste ASTRUZ")
         with st.expander("Modèles"):
