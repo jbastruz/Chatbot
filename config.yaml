@@ -9,25 +9,5 @@ credentials:
       logged_in: false
       name: Jean-Baptiste
       password: *********
-    jmastruz:
-      email: none
-      logged_in: false
-      name: Jean-Marc
-      password: *********
-    mimoune:
-      email: none
-      logged_in: false
-      name: Mimoune
-      password: *********
-    iastruz:
-      email: none
-      logged_in: false
-      name: Isabelle
-      password: *********
-    tokiwooki:
-      email: none
-      logged_in: false
-      name: Caroline
-      password: *********
 preauthorized:
   emails: []
